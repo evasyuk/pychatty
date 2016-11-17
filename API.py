@@ -229,15 +229,23 @@ def on_add_friend(headers, friend_uid):  # it is a GET request
     def on_success(user_from):
         if friend_uid is not None:
             actual_user = users_storage.get_user(uid=user_from)
+            friend_user = users_storage.get_user(uid=friend_uid)
             if friend_uid in actual_user.friends:
                 response = json.dumps({'error': "already friends"})
                 return response, 400
             else:
                 actual_user.friends.extend(friend_uid)
+                friend_user.friends.extend(user_from.uid)
+
+                _temp = list()
+                _temp.append(actual_user)
+                _temp.append(friend_user)
+                dialog = dialogs_storage.create_dialog(list_of_users=_temp)
 
                 users_storage.update_user(user=actual_user)
+                users_storage.update_user(user=friend_user)
 
-                response = json.dumps(actual_user)
+                response = json.dumps({actual_user, dialog})
                 return response, 200
         else:
             response = json.dumps({'error': "friend uid missing"})
