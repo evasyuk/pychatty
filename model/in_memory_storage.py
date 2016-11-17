@@ -1,7 +1,7 @@
 import json
 from model.models import User, Dialog
 from util.datetime_utils import DateTimeUtils
-import util.uid_generator as uid_generator
+from util.utils_common import uid_generator
 
 
 class UpdateHistoryManager(object):
@@ -146,13 +146,19 @@ class DialogsHolders(object):
         return DialogsHolders.__instance
 
     def create_dialog(self, list_of_users):
-        did = uid_generator()
-        dialog = Dialog(dialog_id=did,
-                        list_of_users=list_of_users,
-                        created=DateTimeUtils.get_today_full_datetime_milliseconds())
+        if isinstance(list_of_users, list):
+            if len(list_of_users) > 0:
+                did = uid_generator()
+                dialog = Dialog(dialog_id=did,
+                                list_of_users=list_of_users,
+                                created=DateTimeUtils.get_today_full_datetime_milliseconds())
 
-        self.storage[did] = dialog
-        return dialog
+                self.storage[did] = dialog
+                return True, dialog
+            else:
+                return False, "list len has to be > 0"
+        else:
+            return False, "list of users has to be list instance"
 
     def get_dialog(self, did):
         if did in self.storage:
