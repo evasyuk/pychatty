@@ -53,15 +53,6 @@ class Dialog(object):
         self.created = created
         self.did = dialog_id
 
-    # def new_msg(self, message):
-    #     from_id = message.from_id
-    #     text = message.text
-    #
-    #     for user in self.list_of_users:
-    #         if from_id != user.id:
-    #             # todo: send message
-    #             pass
-
 
 class Message(object):
     """
@@ -93,17 +84,17 @@ class Message(object):
                 try:
                     text = params['text']
                 except KeyError:
-                    return False, "from_id key not found"
+                    return False, "text key not found"
 
                 try:
                     dialog_id = params['dialog_id']
                 except KeyError:
-                    return False, "from_id key not found"
+                    return False, "dialog_id key not found"
 
                 try:
                     time_stamp = params['time_stamp']
                 except KeyError:
-                    return False, "from_id key not found"
+                    return False, "time_stamp key not found"
 
                 msg = Message(from_id=from_id, text=text, dialog_id=dialog_id, time_stamp=time_stamp)
                 return True, msg
