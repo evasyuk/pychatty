@@ -5,12 +5,19 @@ class User(object):
     Icon URL
     id
 
+    todo: define _eq_ and _ne_ methods
+
     """
 
-    def __init__(self, uid=None, name=None, secret=None, icon=None, friends=list(), dialogs=list(), _dict=None):
+    def __init__(self, uid=None, name=None, secret=None, icon="", friends=list(), dialogs=list(), _dict=None):
         if _dict is not None:
             self.__dict__ = _dict
             return
+
+        assert uid is not None
+        assert name is not None
+        assert secret is not None
+        assert uid is not None
 
         self.uid = uid
         self.name = name

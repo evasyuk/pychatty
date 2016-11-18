@@ -89,6 +89,7 @@ class UserHistoryHolder(object):
         return result
 
 
+# covered
 class UsersHolder(object):
     def __init__(self):
         self.storage = dict()
@@ -132,6 +133,7 @@ class UsersHolder(object):
         return True, result
 
 
+# covered
 class DialogsHolders(object):
 
     __instance = None
