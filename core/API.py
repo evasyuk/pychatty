@@ -30,6 +30,10 @@ def login(params):
     :param params:
     :return:
     """
+    if params is None:
+        response = json.dumps({'error': "missing params"})
+        return response, 400
+
     try:
         uid = params['uid']
         secret = params['secret']
@@ -42,7 +46,7 @@ def login(params):
     if found:
         if user.secret == secret:
             try:
-                token = jwt_util.encode_token(json_payload=user)
+                token = jwt_util.encode_token(json_payload=user.to_dict())
 
                 response = json.dumps({'token': token})
                 return response, 200
