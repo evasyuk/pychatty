@@ -1,5 +1,5 @@
 import unittest
-from model.in_memory_storage import DialogsHolders, UsersHolder, UserUpdateHolder
+from model.in_memory_storage import DialogsHolders, UsersHolder, UserUpdateHolder, UserHistoryHolder
 from model.models import User, Message
 
 
@@ -105,7 +105,53 @@ class TestSet(unittest.TestCase):
         pass  # do not know how to automate validation -> seems to be OK
 
     def test_user_history_holder(self):
-        pass
+        #####
+        # from previous test
+
+        # 1. create users
+        user1 = User(uid="uid_test0", name="name test0", secret="secr1111")
+        user2 = User(uid="uid_test1", name="name test1", secret="secr1111")
+
+        # 2. imitate dialog
+        # dialog_holders = DialogsHolders.get_instance()
+        #
+        # list_of_users = list()
+        # list_of_users.append(user1.uid)
+        # list_of_users.append(user2.uid)
+        #
+        # success, dialog = dialog_holders.create_dialog(list_of_users=list_of_users)
+
+        # 3. prepare messages
+        msg1 = Message(dialog_id="did_test", text="test from_id=user1.uid", from_id=user1.uid, time_stamp=-1)
+        msg2 = Message(dialog_id="did_test", text="text from_id=user2.uid", from_id=user2.uid, time_stamp=-2)
+        msg3 = Message(dialog_id="did_test", text="text from_id=user2.uid 2", from_id=user2.uid, time_stamp=-3)
+
+        # 4. prepare update holders
+        update_holder_u1 = UserUpdateHolder(user_id=user1.uid)
+        update_holder_u2 = UserUpdateHolder(user_id=user2.uid)
+
+        update_holder_u1.add(message=msg1, dialog_id="did_test")
+        update_holder_u1.add(message=msg2, dialog_id="did_test")
+        update_holder_u1.add(message=msg3, dialog_id="did_test")
+
+        update_holder_u1_dict = update_holder_u1.get_as_dict()
+        update_holder_u2_dict = update_holder_u2.get_as_dict()
+
+        j_result = update_holder_u1.get_as_json()
+
+        #####
+        # this test
+
+        history_holder_u1 = UserHistoryHolder(user_id=user1.uid)
+        history_holder_u2 = UserHistoryHolder(user_id=user2.uid)
+
+        history_holder_u1.on_add(user_update_dict=update_holder_u1_dict)
+        history_holder_u2.on_add(user_update_dict=update_holder_u2_dict)
+
+        history_holder_u1_dict = history_holder_u1.to_dict()
+        history_holder_u2_dict = history_holder_u2.to_dict()
+
+        pass  # todo: automate validation
 
     def test_update_history_manager(self):
         pass

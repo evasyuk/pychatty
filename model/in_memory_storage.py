@@ -111,7 +111,7 @@ class UserHistoryHolder(object):  # it is a data structure
         self.user_id = user_id
 
     def on_add(self, user_update_dict):
-        for dialog_id, dialog_list in user_update_dict.iteritems():
+        for dialog_id, dialog_list in user_update_dict['storage'].iteritems():
             try:
                 local_dialog_list = self.storage[dialog_id]
             except KeyError:
@@ -119,7 +119,7 @@ class UserHistoryHolder(object):  # it is a data structure
 
             local_dialog_list.extend(dialog_list)
 
-        user_update_dict.clear()
+        # user_update_dict.clear()  # works only with direct object array -> call on top
 
     def get_as_json(self, dialog_id):
         try:
@@ -128,6 +128,39 @@ class UserHistoryHolder(object):  # it is a data structure
             return None
 
         return result
+
+    def to_dict(self, target_dict=None):
+        """
+        Recursive serialization to dict
+
+        :param target_dict:
+        :return:
+        """
+        if target_dict is None:
+            target_dict = self.storage
+
+        result_dict = dict()
+
+        def to_inner_dict(actual_value):
+            if hasattr(actual_value, 'to_dict'):
+                return actual_value.to_dict()
+            else:
+                return actual_value
+
+        for key, value in target_dict.iteritems():
+            if value is not None:
+                if isinstance(value, dict):
+                    result_dict[key] = self.to_dict(target_dict=value)
+                elif isinstance(value, list):
+                    temp = list()
+
+                    for item in value:
+                        temp.append(to_inner_dict(actual_value=item))
+                    result_dict[key] = temp
+                else:
+                    result_dict[key] = to_inner_dict(actual_value=value)
+
+        return result_dict
 
 
 # covered
