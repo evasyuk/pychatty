@@ -1,3 +1,5 @@
+import json
+
 
 class User(object):
     """
@@ -74,6 +76,30 @@ class Message(object):
         self.text = text
         self.dialog_id = dialog_id
         self.time_stamp = time_stamp
+
+    def to_json(self):
+        """
+        Returns:
+            str:
+        """
+        return json.dumps(self.to_dict())
+
+    def to_dict(self):
+        """
+        Returns:
+            dict:
+        """
+        data = dict()
+
+        for key in iter(self.__dict__):
+            value = self.__dict__[key]
+            if value is not None:
+                if hasattr(value, 'to_dict'):
+                    data[key] = value.to_dict()
+                else:
+                    data[key] = value
+
+        return data
 
     @staticmethod
     def from_dict(params):

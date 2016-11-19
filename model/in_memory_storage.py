@@ -37,7 +37,7 @@ class UpdateHistoryManager(object):
         return user_histories.get_as_json(dialog_id=dialog_id)
 
 
-class UserUpdateHolder(object):
+class UserUpdateHolder(object):  # it is a data structure
     def __init__(self, user_id):
         self.storage = dict()
         self.user_id = user_id
@@ -51,11 +51,52 @@ class UserUpdateHolder(object):
         dialog_list.append(message)
 
     def get_as_json(self):
-        result = json.dumps(self.storage)  # 1. prepare data as JSON
+        result = self.to_json()
         # self.storage = dict()  # 2. wipe out data
         # # todo: is it memory safe to do such a thing
 
         return result
+
+    def to_json(self):
+        """
+        Returns:
+            str:
+        """
+        temp = self.to_dict()
+        return json.dumps(temp)
+
+    def to_dict(self, target_dict=None):
+        """
+        Recursive serialization to dict
+
+        :param target_dict:
+        :return:
+        """
+        if target_dict is None:
+            target_dict = self.storage
+
+        result_dict = dict()
+
+        def to_inner_dict(actual_value):
+            if hasattr(actual_value, 'to_dict'):
+                return actual_value.to_dict()
+            else:
+                return actual_value
+
+        for key, value in target_dict.iteritems():
+            if value is not None:
+                if isinstance(value, dict):
+                    result_dict[key] = self.to_dict(target_dict=value)
+                elif isinstance(value, list):
+                    temp = list()
+
+                    for item in value:
+                        temp.append(to_inner_dict(actual_value=item))
+                    result_dict[key] = temp
+                else:
+                    result_dict[key] = to_inner_dict(actual_value=value)
+
+        return result_dict
 
     def get_as_dict(self):
         return dict(self.__dict__)
@@ -64,7 +105,7 @@ class UserUpdateHolder(object):
         self.storage = dict()
 
 
-class UserHistoryHolder(object):
+class UserHistoryHolder(object):  # it is a data structure
     def __init__(self, user_id):
         self.storage = dict()
         self.user_id = user_id
