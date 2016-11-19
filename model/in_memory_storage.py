@@ -5,30 +5,51 @@ from util.utils_common import uid_generator
 
 
 class UpdateHistoryManager(object):
-    def __init__(self):
+    def __init__(self, dialogs_holder):
         self.dict_of_users_updates = dict()
         self.dict_of_users_histories = dict()
+        self.dialogs_holder = dialogs_holder
 
-    def on_new_msg(self, msg, dialog):
+    def on_new_msg(self, msg):
         dialog_id = msg.dialog_id
 
-        for other_user_id in dialog.list_of_users:
-            try:
-                user_updates = self.dict_of_users_updates[other_user_id]
-            except KeyError:
-                user_updates = self.dict_of_users_updates[other_user_id] = UserUpdateHolder(user_id=other_user_id)
+        found, dialog = self.dialogs_holder.get_dialog(did=dialog_id)
+        if found:
+            for other_user_id in dialog.list_of_users:
+                try:
+                    user_updates = self.dict_of_users_updates[other_user_id]
+                except KeyError:
+                    user_updates = self.dict_of_users_updates[other_user_id] = UserUpdateHolder(user_id=other_user_id)
 
-            user_updates.add(message=msg, dialog_id=dialog_id)
+                user_updates.add(message=msg, dialog_id=dialog_id)
 
-    def on_get_update(self, user_id):
+            return True, "OK"
+        else:
+            return False, "dialog with did[%s] not found" % dialog_id
+
+    def on_get_update_json(self, user_id):
         try:
             user_updates = self.dict_of_users_updates[user_id]
 
-            return user_updates.get_as_json()
+            # copy to history storage
+            # try:
+            #     user_histories = self.dict_of_users_histories[user_id]
+            # except KeyError:
+            #     user_histories = self.dict_of_users_histories[user_id] = UserHistoryHolder(user_id=user_id)
+
+            result = user_updates.get_as_json()
+            #
+            # for did, update in user_updates.storage.iteritems():
+            #     user_histories.on_add(user_update_dict=update)
+
+            user_updates.clear()
+
+            return result
         except KeyError:
             return json.dumps({})
 
-    def on_get_history(self, user_id, dialog_id=None):
+    def on_get_history_json(self, user_id, dialog_id=None):
+        # todo: not working yet
         try:
             user_histories = self.dict_of_users_histories[user_id]
         except KeyError:
@@ -37,6 +58,7 @@ class UpdateHistoryManager(object):
         return user_histories.get_as_json(dialog_id=dialog_id)
 
 
+# covered
 class UserUpdateHolder(object):  # it is a data structure
     def __init__(self, user_id):
         self.storage = dict()
@@ -105,21 +127,32 @@ class UserUpdateHolder(object):  # it is a data structure
         self.storage = dict()
 
 
+# covered
 class UserHistoryHolder(object):  # it is a data structure
     def __init__(self, user_id):
         self.storage = dict()
         self.user_id = user_id
 
     def on_add(self, user_update_dict):
-        for dialog_id, dialog_list in user_update_dict['storage'].iteritems():
+        for msg in user_update_dict:
+            dialog_id = msg.dialog_id
+
             try:
                 local_dialog_list = self.storage[dialog_id]
             except KeyError:
                 local_dialog_list = self.storage[dialog_id] = list()
 
-            local_dialog_list.extend(dialog_list)
+            local_dialog_list.append(msg)
 
-        # user_update_dict.clear()  # works only with direct object array -> call on top
+        # for dialog_id, dialog_list in user_update_dict['storage'].iteritems():
+        #     try:
+        #         local_dialog_list = self.storage[dialog_id]
+        #     except KeyError:
+        #         local_dialog_list = self.storage[dialog_id] = list()
+        #
+        #     local_dialog_list.extend(dialog_list)
+        #
+        # # user_update_dict.clear()  # works only with direct object array -> call on top
 
     def get_as_json(self, dialog_id):
         try:

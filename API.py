@@ -110,7 +110,7 @@ def on_new_msg(headers, params):
             if found_dialog:
                 update_history_manager.on_new_msg(msg=msg, dialog=dialog)
 
-                response = update_history_manager.on_get_update(user_id=user_id)
+                response = update_history_manager.on_get_update_json(user_id=user_id)
                 return response, 200
             else:
                 response = json.dumps({'error': "dialog object with specified not found"})
@@ -134,7 +134,7 @@ def on_update_request(headers):
     def on_success(user_from):
         user_id = user_from.uid
 
-        response = update_history_manager.on_get_update(user_id=user_id)
+        response = update_history_manager.on_get_update_json(user_id=user_id)
         return response, 200
 
     return check_auth(headers=headers, success_runnable=on_success)
@@ -144,7 +144,7 @@ def on_update_request(headers):
 def on_history_request(headers, dialog_id=None):
     def on_success(user_from):
         user_id = user_from.uid
-        response = update_history_manager.on_get_history(user_id=user_id, dialog_id=dialog_id)
+        response = update_history_manager.on_get_history_json(user_id=user_id, dialog_id=dialog_id)
         return response, 200
 
     return check_auth(headers=headers, success_runnable=on_success)

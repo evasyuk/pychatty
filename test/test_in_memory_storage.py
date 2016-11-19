@@ -1,5 +1,6 @@
 import unittest
-from model.in_memory_storage import DialogsHolders, UsersHolder, UserUpdateHolder, UserHistoryHolder
+from model.in_memory_storage import DialogsHolders, UsersHolder, UserUpdateHolder, UserHistoryHolder, \
+    UpdateHistoryManager
 from model.models import User, Message
 
 
@@ -154,4 +155,42 @@ class TestSet(unittest.TestCase):
         pass  # todo: automate validation
 
     def test_update_history_manager(self):
+
+        # 1. create users
+        user1 = User(uid="uid_test0", name="name test0", secret="secr1111")
+        user2 = User(uid="uid_test1", name="name test1", secret="secr1111")
+
+        dialog_holders = DialogsHolders.get_instance()
+
+        list_of_users = list()
+        list_of_users.append(user1.uid)
+        list_of_users.append(user2.uid)
+
+        success, dialog = dialog_holders.create_dialog(list_of_users=list_of_users)
+        assert success
+        assert len(dialog.list_of_users) == len(list_of_users)
+
+        update_history_manager = UpdateHistoryManager(dialogs_holder=dialog_holders)
+
+        # 3. prepare messages
+        msg1 = Message(dialog_id=dialog.did, text="test from_id=user1.uid", from_id=user1.uid, time_stamp=-1)
+        msg2 = Message(dialog_id=dialog.did, text="text from_id=user2.uid", from_id=user2.uid, time_stamp=-2)
+        msg3 = Message(dialog_id=dialog.did, text="text from_id=user2.uid 2", from_id=user2.uid, time_stamp=-3)
+
+        success_msg1, info_msg1 = update_history_manager.on_new_msg(msg=msg1)
+        success_msg2, info_msg2 = update_history_manager.on_new_msg(msg=msg2)
+        success_msg3, info_msg3 = update_history_manager.on_new_msg(msg=msg3)
+        assert success_msg1, info_msg1
+        assert success_msg2, info_msg2
+        assert success_msg3, info_msg3
+
+        history_before_u1 = update_history_manager.on_get_history_json(user1.uid, dialog_id=dialog.did)
+        history_before_u2 = update_history_manager.on_get_history_json(user2.uid, dialog_id=dialog.did)
+
+        updates_u1 = update_history_manager.on_get_update_json(user_id=user1.uid)
+        updates_u2 = update_history_manager.on_get_update_json(user_id=user2.uid)
+
+        history_after_u1 = update_history_manager.on_get_history_json(user1.uid, dialog_id=dialog.did)
+        history_after_u2 = update_history_manager.on_get_history_json(user2.uid, dialog_id=dialog.did)
+
         pass
