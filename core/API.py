@@ -13,7 +13,7 @@ users_storage = UsersHolder()
 ########################################################################################################################
 # login
 
-# done
+# done covered
 def login(params):
     """
     To obtain access token user need to provide 2 basic parameters:
@@ -64,7 +64,7 @@ def login(params):
 # def logout(headers, params):
 #     pass
 
-# done
+# done covered
 def check_auth(success_runnable, headers):
     try:
         decoded = jwt_util.decode_token(encoded_payload=headers['token'])
@@ -182,7 +182,7 @@ def on_history_request(headers, dialog_id=None):
 ########################################################################################################################
 # user
 
-# done
+# done covered
 def on_add_user(params):  # it is a kind of registration
     """
     To create user provide 3 basic parameters
@@ -227,29 +227,47 @@ def on_add_friend(headers, friend_uid):  # it is a GET request
         400 already friends
         200 friend added
 
+    Response:
+    {
+        "dialog": {
+        }
+    }
+
     :param headers:
     :return:
     """
     def on_success(user_from):
         if friend_uid is not None:
-            actual_user = users_storage.get_user(uid=user_from)
-            friend_user = users_storage.get_user(uid=friend_uid)
+            found, actual_user = users_storage.get_user(uid=user_from.uid)
+            if not found:
+                response = json.dumps({'error': "user not existed"})
+                return response, 400
+
+            found, friend_user = users_storage.get_user(uid=friend_uid)
+            if not found:
+                response = json.dumps({'error': "friend not existed"})
+                return response, 400
+
             if friend_uid in actual_user.friends:
                 response = json.dumps({'error': "already friends"})
                 return response, 400
             else:
-                actual_user.friends.extend(friend_uid)
-                friend_user.friends.extend(user_from.uid)
+                actual_user.friends.append(friend_uid)
+                friend_user.friends.append(user_from.uid)
 
                 _temp = list()
                 _temp.append(actual_user)
                 _temp.append(friend_user)
-                dialog = dialogs_storage.create_dialog(list_of_users=_temp)
+                created, dialog = dialogs_storage.create_dialog(list_of_users=_temp)
+
+                if not created:
+                    response = json.dumps({'error': dialog})
+                    return response, 400
 
                 users_storage.update_user(user=actual_user)
                 users_storage.update_user(user=friend_user)
 
-                response = json.dumps({actual_user, dialog})
+                response = json.dumps({'dialog': dialog.to_dict()})
                 return response, 200
         else:
             response = json.dumps({'error': "friend uid missing"})

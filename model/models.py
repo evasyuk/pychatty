@@ -89,6 +89,46 @@ class Dialog(object):
         self.created = created
         self.did = dialog_id
 
+    def to_json(self):
+        """
+        Returns:
+            str:
+        """
+        return json.dumps(self.to_dict())
+
+    def to_dict(self, target_dict=None):
+        """
+        Recursive serialization to dict
+
+        :param target_dict:
+        :return:
+        """
+        if target_dict is None:
+            target_dict = self.__dict__
+
+        result_dict = dict()
+
+        def to_inner_dict(actual_value):
+            if hasattr(actual_value, 'to_dict'):
+                return actual_value.to_dict()
+            else:
+                return actual_value
+
+        for key, value in target_dict.iteritems():
+            if value is not None:
+                if isinstance(value, dict):
+                    result_dict[key] = self.to_dict(target_dict=value)
+                elif isinstance(value, list):
+                    temp = list()
+
+                    for item in value:
+                        temp.append(to_inner_dict(actual_value=item))
+                    result_dict[key] = temp
+                else:
+                    result_dict[key] = to_inner_dict(actual_value=value)
+
+        return result_dict
+
 
 class Message(object):
     """
