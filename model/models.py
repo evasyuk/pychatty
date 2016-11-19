@@ -30,6 +30,30 @@ class User(object):
         # self.pending_friends = pending_friends
         # self.blocked_users = blocked_users
 
+    def to_json(self):
+        """
+        Returns:
+            str:
+        """
+        return json.dumps(self.to_dict())
+
+    def to_dict(self):
+        """
+        Returns:
+            dict:
+        """
+        data = dict()
+
+        for key in iter(self.__dict__):
+            value = self.__dict__[key]
+            if value is not None:
+                if hasattr(value, 'to_dict'):
+                    data[key] = value.to_dict()
+                else:
+                    data[key] = value
+
+        return data
+
     @staticmethod
     def from_dict(params):
         if params is None:
@@ -41,7 +65,10 @@ class User(object):
                 try:
                     uid = params['uid']
                     name = params['name']
-                    icon = params['icon']
+                    if not 'icon' in params:
+                        icon = ""
+                    else:
+                        icon = params['icon']
                     secret = params['secret']
 
                     user = User(uid=uid, name=name, icon=icon, secret=secret)

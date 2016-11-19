@@ -5,10 +5,9 @@ from model.models import Message, User
 from util import jwt_util
 
 # return "¯\_(ツ)_/¯: not implemented yet", 501
-
-update_history_manager = UpdateHistoryManager()
-users_storage = UsersHolder()
 dialogs_storage = DialogsHolders.get_instance()
+update_history_manager = UpdateHistoryManager(dialogs_holder=dialogs_storage)
+users_storage = UsersHolder()
 
 
 ########################################################################################################################
@@ -108,7 +107,7 @@ def on_new_msg(headers, params):
             found_dialog, dialog = dialogs_storage.get_dialog(did=dialog_id)
 
             if found_dialog:
-                update_history_manager.on_new_msg(msg=msg, dialog=dialog)
+                update_history_manager.on_new_msg(msg=msg)
 
                 response = update_history_manager.on_get_update_json(user_id=user_id)
                 return response, 200
@@ -184,9 +183,10 @@ def on_add_user(params):  # it is a kind of registration
     """
     To create user provide 3 basic parameters
 
-    - unique id (email for instance)
-    - user name
-    - user url icon (optional)
+    - uid - unique id (email for instance)
+    - name - user name
+    - icon - user url icon (optional)
+    - secret - password
 
     Cases to cover:
         400 missing params
@@ -205,7 +205,7 @@ def on_add_user(params):  # it is a kind of registration
         result, info = users_storage.add_user(user)
 
         if result:
-            response = json.dumps(user)
+            response = user.to_json()
             return response, 201
         else:
             response = json.dumps({'error': info})
