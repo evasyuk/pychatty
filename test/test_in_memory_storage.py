@@ -103,6 +103,8 @@ class TestSet(unittest.TestCase):
         update_holder_u2_dict = update_holder_u2.get_as_dict()
 
         j_result = update_holder_u1.get_as_json()
+
+        print "[test_user_update_holder] test cases finished"
         pass  # do not know how to automate validation -> seems to be OK
 
     def test_user_history_holder(self):
@@ -146,12 +148,16 @@ class TestSet(unittest.TestCase):
         history_holder_u1 = UserHistoryHolder(user_id=user1.uid)
         history_holder_u2 = UserHistoryHolder(user_id=user2.uid)
 
-        history_holder_u1.on_add(user_update_dict=update_holder_u1_dict)
-        history_holder_u2.on_add(user_update_dict=update_holder_u2_dict)
+        for did, dialog_update in update_holder_u1.storage.iteritems():
+            history_holder_u1.on_add(dialog_update_list=dialog_update)
+
+        for did, dialog_update in update_holder_u1.storage.iteritems():
+            history_holder_u2.on_add(dialog_update_list=dialog_update)
 
         history_holder_u1_dict = history_holder_u1.to_dict()
         history_holder_u2_dict = history_holder_u2.to_dict()
 
+        print "[test_user_history_holder] test cases finished"
         pass  # todo: automate validation
 
     def test_update_history_manager(self):
@@ -193,4 +199,5 @@ class TestSet(unittest.TestCase):
         history_after_u1 = update_history_manager.on_get_history_json(user1.uid, dialog_id=dialog.did)
         history_after_u2 = update_history_manager.on_get_history_json(user2.uid, dialog_id=dialog.did)
 
+        print "[test_update_history_manager] test cases finished"
         pass
