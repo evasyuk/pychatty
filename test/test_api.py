@@ -5,7 +5,7 @@ import core.API as api
 
 class TestSet(unittest.TestCase):
 
-    def test_add_user(self, uid="some@e.mail", usecret="1234"):
+    def test_add_user(self, uid="some@e.mail", usecret="1234", result=False):
         uname = "user-" + uid
 
         params_invalid_0 = None
@@ -21,14 +21,23 @@ class TestSet(unittest.TestCase):
         invalid_response_1, inv_resp_code_1 = api.on_add_user(params=params_invalid_1)
         valid_response, v_resp_code = api.on_add_user(params=params_valid)
 
-        assert inv_resp_code_0 == 400, str(inv_resp_code_0) + invalid_response_0
-        assert inv_resp_code_1 == 400, str(inv_resp_code_1) + invalid_response_1
-        assert v_resp_code == 201, str(v_resp_code) + valid_response
+        if result:
+            if v_resp_code == 201:
+                return
+            elif v_resp_code == 400 and "already exists" in valid_response:
+                return
+        else:
+            assert inv_resp_code_0 == 400, str(inv_resp_code_0) + invalid_response_0
+            assert inv_resp_code_1 == 400, str(inv_resp_code_1) + invalid_response_1
+            if not v_resp_code == 201 or v_resp_code == 400 and "already exists" in valid_response:
+                pass
+            else:
+                assert v_resp_code == 201, str(v_resp_code) + valid_response
 
-        print "test[test_add_user] finished"
+            print "test[test_add_user] finished"
 
     def test_login(self, uid="some@e.mail", usecret="1234", result=False):
-        self.test_add_user(uid=uid, usecret=usecret)
+        self.test_add_user(uid=uid, usecret=usecret, result=result)
 
         params_invalid_0 = None
 
@@ -81,7 +90,36 @@ class TestSet(unittest.TestCase):
         print "test[test_add_friend] finished"
 
     def test_remove_friend(self):
-        pass
+        uid_1 = "uid_user_1"
+        uid_2 = "uid_user_2"
+
+        usecret_1 = "usecret_1"
+        usecret_2 = "usecret_2"
+
+        resp, code = self.test_login(uid=uid_1, usecret=usecret_1, result=True)
+        assert code == 200, resp
+
+        resp_dict = json.loads(resp)
+
+        headers = dict()
+        headers['token'] = resp_dict['token']
+
+        resp, code = api.on_add_friend(headers=headers, friend_uid=None)
+        assert code == 400, str(code) + resp
+
+        resp, code = api.on_add_friend(headers=headers, friend_uid="--")
+        assert code == 400, str(code) + resp
+
+        resp, code = self.test_login(uid=uid_2, usecret=usecret_2, result=True)
+        assert code == 200, resp
+
+        resp, code = api.on_remove_friend(headers=headers, friend_uid=uid_2)
+        assert code == 200, str(code) + resp
+
+        resp, code = api.on_remove_friend(headers=headers, friend_uid=uid_2)
+        assert code == 400, str(code) + resp
+
+        print "test[test_remove_friend] finished"
 
     def test_new_msg(self):
         pass
@@ -89,5 +127,5 @@ class TestSet(unittest.TestCase):
     def test_update(self):
         pass
 
-    def test_history(self):
-        pass
+    # def test_history(self):
+    #     pass
