@@ -134,15 +134,18 @@ class UserHistoryHolder(object):  # it is a data structure
         self.user_id = user_id
 
     def on_add(self, user_update_dict):
-        for msg in user_update_dict:
-            dialog_id = msg.dialog_id
+        user_id = user_update_dict['user_id']
 
-            try:
-                local_dialog_list = self.storage[dialog_id]
-            except KeyError:
-                local_dialog_list = self.storage[dialog_id] = list()
+        for did, d_list in user_update_dict['storage'].iteritems():
+            for msg in d_list:
+                dialog_id = msg.dialog_id
 
-            local_dialog_list.append(msg)
+                try:
+                    local_dialog_list = self.storage[dialog_id]
+                except KeyError:
+                    local_dialog_list = self.storage[dialog_id] = list()
+
+                local_dialog_list.append(msg)
 
         # for dialog_id, dialog_list in user_update_dict['storage'].iteritems():
         #     try:
