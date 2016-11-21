@@ -260,21 +260,16 @@ class DialogsHolders(object):
 
     def create_dialog(self, list_of_users):
         if isinstance(list_of_users, list):
-            if len(list_of_users) > 0:
-                did = ""
+            success, did = Dialog.did_from_users_list(list_of_users)
 
-                # todo: this is a horrible idea for group chats with big number of participants
-                for item in list_of_users:
-                    did += item.uid
-
+            if success:
                 dialog = Dialog(dialog_id=did,
                                 list_of_users=list_of_users,
                                 created=DateTimeUtils.get_today_full_datetime_milliseconds())
-
                 self.storage[did] = dialog
                 return True, dialog
             else:
-                return False, "list len has to be > 0"
+                return False, did
         else:
             return False, "list of users has to be list instance"
 

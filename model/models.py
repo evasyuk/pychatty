@@ -84,10 +84,41 @@ class Dialog(object):
     created
 
     """
+
+    SEPARATOR = "::"
+
     def __init__(self, dialog_id, list_of_users, created):
         self.list_of_users = list_of_users
         self.created = created
         self.did = dialog_id
+
+    @staticmethod
+    def users_list_from_did(did):
+        if not isinstance(did, str):
+            return False, "wrong did type"
+        if len(did) > 3:
+            result = did.split(Dialog.SEPARATOR)
+            return True, result
+        else:
+            return False, "did is wrong"
+
+    @staticmethod
+    def did_from_users_list(list_of_users):
+        if len(list_of_users) > 0:
+            did = ""
+            # todo: this is a horrible idea for group chats with big number of participants
+
+            index = 0
+            for item in list_of_users:
+                if 0 < index < len(list_of_users):
+                    did += "::"
+                did += item
+
+                index += 1
+
+            return True, did
+        else:
+            return False, "list len has to be > 0"
 
     def to_json(self):
         """

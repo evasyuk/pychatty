@@ -85,7 +85,10 @@ def on_new_msg(headers, params):
     """
     Expecting Message object in params
     {
-
+        From_id
+        Text
+        Dialog_id
+        Timestamp
     }
 
     Cases to cover:
@@ -106,14 +109,14 @@ def on_new_msg(headers, params):
             return response, 400
         else:
             dialog_id = msg.dialog_id
-            user_id = msg.user_id
 
             found_dialog, dialog = dialogs_storage.get_dialog(did=dialog_id)
 
             if found_dialog:
                 update_history_manager.on_new_msg(msg=msg)
 
-                response = update_history_manager.on_get_update_json(user_id=user_id)
+                # response = update_history_manager.on_get_update_json(user_id=user_id)
+                response = "{}"
                 return response, 200
             else:
                 response = json.dumps({'error': "dialog object with specified not found"})
@@ -256,8 +259,8 @@ def on_add_friend(headers, friend_uid):  # it is a GET request
                 friend_user.friends.append(user_from.uid)
 
                 _temp = list()
-                _temp.append(actual_user)
-                _temp.append(friend_user)
+                _temp.append(actual_user.uid)
+                _temp.append(friend_user.uid)
                 created, dialog = dialogs_storage.create_dialog(list_of_users=_temp)
 
                 if not created:

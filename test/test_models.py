@@ -22,7 +22,7 @@ class TestSet(unittest.TestCase):
         params_invalid_0 = dict()
         params_invalid_0['uid'] = uid
         params_invalid_0['name'] = "Mario"
-        params_invalid_0['secret'] = secret
+        # params_invalid_0['secret'] = secret
 
         success_invalid_0, info = User.from_dict(params=params_invalid_0)
         assert not success_invalid_0, "expected KeyError, " + info
