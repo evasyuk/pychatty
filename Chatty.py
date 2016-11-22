@@ -69,4 +69,4 @@ def route_user_add_friend(friend_uid):
 
 
 if __name__ == '__main__' or __name__ == 'uwsgi_file_Chatty':
-    application.run()
+    application.run(host='127.0.0.1', port=8080)
