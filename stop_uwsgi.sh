@@ -1,0 +1,1 @@
+exec uwsgi --stop /tmp/pychatty.pid
