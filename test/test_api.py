@@ -159,8 +159,7 @@ class TestSet(unittest.TestCase):
         usecret_1 = "usecret_1"
         usecret_2 = "usecret_2"
 
-        self.test_add_user(uid=uid_1, usecret=usecret_1, result=True)
-        self.test_add_user(uid=uid_2, usecret=usecret_2, result=True)
+        self.test_add_friend()
 
         resp, code = self.test_login(uid=uid_1, usecret=usecret_1, result=True)
         assert code == 200, resp
@@ -169,6 +168,17 @@ class TestSet(unittest.TestCase):
 
         headers = dict()
         headers['token'] = resp_dict['token']
+
+        success, dialog_id = Dialog.did_from_users_list([uid_1, uid_2])
+        assert success, dialog_id
+
+        msg1 = Message(dialog_id=dialog_id, text="test text", from_id=uid_1, time_stamp=-1)
+        msg2 = Message(dialog_id=dialog_id, text="text test", from_id=uid_2, time_stamp=-2)
+
+        valid_params = msg1.to_dict()
+
+        resp, code = api.on_new_msg(headers=headers, params=valid_params)
+        assert code == 200, str(code) + resp
 
         resp, code = api.on_update_request(headers=headers)
         assert code == 200, str(code) + resp
