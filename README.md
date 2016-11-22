@@ -4,6 +4,7 @@ This a custom messenger platform.
 Designed in academical purposes as hobby project.
 After the third milestone expected to be useful in production.
 
+API description at apiary: http://docs.pychatty.apiary.io/#
 ========================================================================================================================
 
 *Milestone 1*
@@ -14,7 +15,6 @@ Works as passive data collector, all updates are grabbed with clients initiative
 Features:
 - accounts
 - p2p dialogs
-==todo==
 - dialog history
 
 Functionality:
@@ -23,7 +23,6 @@ Functionality:
 - simple api security
 - add friend to account
 - remove friend from account
-==todo==
 - post new message
 - updates via http (inspired by Telegram bot scheme)
 
