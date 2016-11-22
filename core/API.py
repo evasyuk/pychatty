@@ -85,10 +85,10 @@ def on_new_msg(headers, params):
     """
     Expecting Message object in params
     {
-        From_id
-        Text
-        Dialog_id
-        Timestamp
+        "from_id": "from_uid",
+        "text": "text",
+        "dialog_id": "did",
+        "timestamp": "1"
     }
 
     Cases to cover:
@@ -232,7 +232,10 @@ def on_add_friend(headers, friend_uid):  # it is a GET request
 
     Response:
     {
-        "dialog": {
+        {
+            "did": "dsf3ed"
+            "created": "1"
+            "list_of_users": []
         }
     }
 

@@ -28,21 +28,20 @@ def route_login():
 ######
 # updates
 
-@application.route('/update/post', methods=['POST'])
-def route_update_post():
-    # headers
-    # params
-    params = request.get_json()
-    headers = request.headers
+@application.route('/update', methods=['GET', 'POST'])
+def route_update():
+    if request.method == 'GET':
+        # headers
+        headers = request.headers
 
-    return api.on_new_msg(params=params, headers=headers)
+        return api.on_update_request(headers=headers)
+    elif request.method == 'POST':
+        # headers
+        # params
+        params = request.get_json()
+        headers = request.headers
 
-@application.route('/update/get', methods=['GET'])
-def route_update_get():
-    # headers
-    headers = request.headers
-
-    return api.on_update_request(headers=headers)
+        return api.on_new_msg(params=params, headers=headers)
 
 ######
 # users
@@ -55,19 +54,18 @@ def route_user_add():
     return api.on_add_user(params=params)
 
 
-@application.route('/user/friend/<string:friend_uid>/add', methods=['POST'])
+@application.route('/user/friend/<string:friend_uid>/add', methods=['GET', 'DELETE'])
 def route_user_add_friend(friend_uid):
-    # headers
-    headers = request.headers
+    if request.method == 'GET':
+        # headers
+        headers = request.headers
 
-    return api.on_add_friend(headers=headers, friend_uid=friend_uid)
+        return api.on_add_friend(headers=headers, friend_uid=friend_uid)
+    elif request.method == 'DELETE':
+        # headers
+        headers = request.headers
 
-@application.route('/user/friend/<string:friend_uid>/remove', methods=['DELETE'])
-def route_user_remove_friend(friend_uid):
-    # headers
-    headers = request.headers
-
-    return api.on_remove_friend(headers=headers, friend_uid=friend_uid)
+        return api.on_remove_friend(headers=headers, friend_uid=friend_uid)
 
 
 if __name__ == '__main__' or __name__ == 'uwsgi_file_Chatty':
