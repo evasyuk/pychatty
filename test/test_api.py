@@ -179,6 +179,8 @@ class TestSet(unittest.TestCase):
 
         resp, code = api.on_new_msg(headers=headers, params=valid_params)
         assert code == 200, str(code) + resp
+        resp, code = api.on_new_msg(headers=headers, params=valid_params)
+        assert code == 200, str(code) + resp
 
         resp, code = api.on_update_request(headers=headers)
         assert code == 200, str(code) + resp
