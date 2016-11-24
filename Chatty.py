@@ -69,6 +69,6 @@ def route_user_add_friend(friend_uid):
 
 
 if __name__ == '__main__' or __name__ == 'uwsgi_file_Chatty':
-    print "main fired"
+    print "main fired[%s]" % __name__
 
     application.run(host='0.0.0.0', port=8080)
