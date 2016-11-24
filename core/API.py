@@ -48,7 +48,7 @@ def login(params):
             try:
                 token = jwt_util.encode_token(json_payload=user.to_dict())
 
-                response = json.dumps({'token': token})
+                response = json.dumps({'token': token, 'user': user.to_dict()})
                 return response, 200
             except Exception as exc:
                 response = json.dumps({'error': exc.message})

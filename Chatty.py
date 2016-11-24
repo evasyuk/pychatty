@@ -55,7 +55,7 @@ def route_user_add():
 
 
 @application.route('/user/me', methods=['GET'])
-def route_user_add():
+def route_user_me():
     # headers
     headers = request.headers
 
