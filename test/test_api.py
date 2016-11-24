@@ -90,6 +90,36 @@ class TestSet(unittest.TestCase):
 
         print "test[test_add_friend] finished"
 
+    def test_get_friends(self):
+        uid_1 = "uid_user_1"
+        uid_2 = "uid_user_2"
+
+        usecret_1 = "usecret_1"
+        usecret_2 = "usecret_2"
+
+        # log in/ register user 1
+        resp, code = self.test_login(uid=uid_1, usecret=usecret_1, result=True)
+        assert code == 200, resp
+
+        # log in/ register user 2
+        resp, code = self.test_login(uid=uid_2, usecret=usecret_2, result=True)
+        assert code == 200, resp
+
+        # prepare auth token as headers
+        resp_dict = json.loads(resp)
+        headers = dict()
+        headers['token'] = resp_dict['token']
+
+        # add user 2 as friend of user 1
+        resp, code = api.on_add_friend(headers=headers, friend_uid=uid_2)
+        assert code == 200, str(code) + resp
+
+        resp, code = api.on_get_friends(headers=headers)
+        assert code == 200, str(code) + resp
+        assert len(resp) > 5, resp
+
+        print "test[test_get_friends] finished"
+
     def test_remove_friend(self):
         uid_1 = "uid_user_1"
         uid_2 = "uid_user_2"

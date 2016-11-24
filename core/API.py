@@ -227,6 +227,25 @@ def on_add_user(params):  # it is a kind of registration
             return response, 400
 
 
+# TODO: investigate add friend problem and user update -> test fails
+def on_get_friends(headers):
+    def on_success(user_from):
+        friends_uid_list = user_from.friends
+
+        result_user_list = list()
+
+        for uid in friends_uid_list:
+            got, user = users_storage.get_user(uid=uid)
+
+            if got:
+                result_user_list.append(user.to_json())
+
+        response = json.dumps(result_user_list)
+        return response, 200
+
+    return check_auth(headers=headers, success_runnable=on_success)
+
+
 # done
 def on_add_friend(headers, friend_uid):  # it is a GET request
     """
