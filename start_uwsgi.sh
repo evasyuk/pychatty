@@ -3,7 +3,7 @@ sudo mkdir /tmp/uwsgi
 
 # prepare virtualenv
 sudo mkdir v_env
-source v_env/bin/activate
+source ./v_env/bin/activate
 
 # prepare project requirements tools
 sudo apt-get install python-pip
