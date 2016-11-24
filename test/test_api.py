@@ -187,5 +187,23 @@ class TestSet(unittest.TestCase):
 
         print "test[test_update] finished"
 
+    def test_get_me(self):
+        uid_1 = "uid_user_1"
+
+        usecret_1 = "usecret_1"
+
+        resp, code = self.test_login(uid=uid_1, usecret=usecret_1, result=True)
+        assert code == 200, resp
+
+        resp_dict = json.loads(resp)
+
+        headers = dict()
+        headers['token'] = resp_dict['token']
+
+        resp, code = api.on_get_me(headers=headers)
+        assert code == 200, str(code) + resp
+
+        print "test[test_get_me] finished"
+
     # def test_history(self):
     #     pass

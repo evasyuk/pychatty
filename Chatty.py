@@ -54,6 +54,14 @@ def route_user_add():
     return api.on_add_user(params=params)
 
 
+@application.route('/user/me', methods=['GET'])
+def route_user_add():
+    # headers
+    headers = request.headers
+
+    return api.on_get_me(headers=headers)
+
+
 @application.route('/user/friend/<string:friend_uid>', methods=['GET', 'DELETE'])
 def route_user_add_friend(friend_uid):
     if request.method == 'GET':

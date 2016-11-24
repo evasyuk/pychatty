@@ -185,6 +185,14 @@ def on_history_request(headers, dialog_id=None):
 ########################################################################################################################
 # user
 
+def on_get_me(headers):  # GET
+    def on_success(user_from):
+        response = json.dumps(user_from.to_dict())
+        return response, 200
+
+    return check_auth(headers=headers, success_runnable=on_success)
+
+
 # done covered
 def on_add_user(params):  # it is a kind of registration
     """
