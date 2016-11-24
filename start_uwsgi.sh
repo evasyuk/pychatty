@@ -30,3 +30,7 @@ exec uwsgi --ini uwsgi.ini --pidfile /tmp/pychatty.pid &
 
 # exit virtualenv
 deactivate
+
+# TODO:
+# venv needs full path
+# start should not fire if socket exists
